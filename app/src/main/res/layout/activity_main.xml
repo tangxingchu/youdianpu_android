@@ -8,46 +8,17 @@
     android:fitsSystemWindows="true"
     tools:context="com.weichu.youdianpu.ui.activity.MainActivity">
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
+        android:layout_height="match_parent">
+    </RelativeLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-            <android.support.v4.view.ViewPager
-                android:id="@+id/vp_horizontal_ntb"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:elevation="8dp"
-            >
-            <devlight.io.library.ntb.NavigationTabBar
-                android:id="@+id/ntb_horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                app:ntb_badge_gravity="top"
-                app:ntb_badge_position="right"
-                android:elevation="8dp"
-                app:ntb_animation_duration="100"
-                app:ntb_badged="false"
-                app:ntb_scaled="true"
-                app:ntb_tinted="true"
-                app:ntb_title_mode="all"
-                app:ntb_titled="true"
-                app:ntb_swiped="false"/>
-        </LinearLayout>
-
-    </LinearLayout>
-
-
+    <com.ashokvarma.bottomnavigation.BottomNavigationBar
+        android:layout_gravity="bottom"
+        android:id="@+id/bottom_navigation_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -57,9 +28,11 @@
         android:layout_marginBottom="76dp"
         android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
-        android:tint="#9f90af"
+        android:tint="@android:color/black"
         android:src="@drawable/scanner"
         android:elevation="6dp"
-        app:backgroundTint="#FFF"/>
+        app:backgroundTint="@color/white"/>
+
+
 
 </android.support.design.widget.CoordinatorLayout>
