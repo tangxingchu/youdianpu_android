@@ -1,6 +1,7 @@
 package com.weichu.youdianpu.ui.activity;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -31,12 +32,16 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationBar bottomNavigationBar = (BottomNavigationBar) findViewById(R.id.bottom_navigation_bar);
 
         bottomNavigationBar
-                .addItem(new BottomNavigationItem(R.drawable.ic_eighth, "Home"))
+                .addItem(new BottomNavigationItem(R.drawable.ic_eighth, "首页"))
                 .addItem(new BottomNavigationItem(R.drawable.ic_fifth, "Books"))
                 .addItem(new BottomNavigationItem(R.drawable.ic_fourth, "Music"))
                 .addItem(new BottomNavigationItem(R.drawable.ic_third, "Movies & TV"))
                 .addItem(new BottomNavigationItem(R.drawable.ic_sixth, "Games"))
                 .setFirstSelectedPosition(0)
+                .setMode(BottomNavigationBar.MODE_FIXED)
+                .setBarBackgroundColor(R.color.white)
+                .setInActiveColor(R.color.black)
+                .setActiveColor(R.color.colorPrimary)
                 .initialise();
 
 
