@@ -1,31 +1,111 @@
 package com.weichu.youdianpu.ui.activity;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.SDKInitializer;
+import com.baidu.mapapi.map.Text;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.weichu.youdianpu.R;
 import com.weichu.youdianpu.ui.fragment.HomeFragment;
 import com.weichu.youdianpu.ui.fragment.MyFragment;
+import com.weichu.youdianpu.ui.fragment.NearbyFragment;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Context mContext;
-
+    private LocationClient mLocationClient;
     private HomeFragment mHomeFragment;
+    private NearbyFragment mNearbyFragment;
     private MyFragment mMyFragment;
+    private static final int REQUESTCODE_MAP = 1;
+    private double lon;
+    private double lat;
+
+    private Stack<Fragment> mStack = new Stack<Fragment>();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //百度定位
+        mLocationClient = new LocationClient(this.getApplicationContext());
+        mLocationClient.registerNotifyLocationListener(new LocationListener());
+        //百度地图
+        SDKInitializer.initialize(this.getApplicationContext());
         setContentView(R.layout.activity_main);
         initUI();
-        this.mContext = this.getApplicationContext();
+        List<String> permissonList = new ArrayList<String>();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissonList.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            permissonList.add(Manifest.permission.READ_PHONE_STATE);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissonList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (!permissonList.isEmpty()) {
+            String[] permissons = permissonList.toArray(new String[permissonList.size()]);
+            ActivityCompat.requestPermissions(this, permissons, REQUESTCODE_MAP);
+        } else {
+            //请求位置信息
+            requestLocation();
+        }
+    }
+
+    private void requestLocation() {
+        LocationClientOption locationClientOption = new LocationClientOption();
+//        locationClientOption.setScanSpan(1000 * 60 * 2);//2分钟定位1次
+        locationClientOption.setIsNeedAddress(true);
+        mLocationClient.setLocOption(locationClientOption);
+        mLocationClient.start();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUESTCODE_MAP:
+                if (grantResults.length > 0) {
+                    for (int result : grantResults) {
+                        if (result != PackageManager.PERMISSION_GRANTED) {
+                            Toast.makeText(this, "同意位置权限能够享受更好的使用体验", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                    }
+                    requestLocation();
+                } else {
+                    Toast.makeText(this, "申请权限出现了错误!", Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     private void initUI() {
@@ -33,10 +113,10 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigationBar
                 .addItem(new BottomNavigationItem(R.drawable.ic_eighth, "首页"))
-                .addItem(new BottomNavigationItem(R.drawable.ic_fifth, "Books"))
+                .addItem(new BottomNavigationItem(R.drawable.ic_fifth, "附近"))
                 .addItem(new BottomNavigationItem(R.drawable.ic_fourth, "Music"))
                 .addItem(new BottomNavigationItem(R.drawable.ic_third, "Movies & TV"))
-                .addItem(new BottomNavigationItem(R.drawable.ic_sixth, "Games"))
+                .addItem(new BottomNavigationItem(R.drawable.ic_sixth, "我的"))
                 .setFirstSelectedPosition(0)
                 .setMode(BottomNavigationBar.MODE_FIXED)
                 .setBarBackgroundColor(R.color.white)
@@ -44,12 +124,13 @@ public class MainActivity extends AppCompatActivity {
                 .setActiveColor(R.color.colorPrimary)
                 .initialise();
 
-
+//        bottomNavigationBar.per
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        if(mHomeFragment == null) {
+        if (mHomeFragment == null) {
             mHomeFragment = new HomeFragment();
-            fragmentTransaction.replace(R.id.fragmentContainer, mHomeFragment);
+            fragmentTransaction.add(R.id.fragmentContainer, mHomeFragment, "homeFragment");
+            mStack.push(mHomeFragment);
         }
         fragmentTransaction.commit();
 
@@ -57,41 +138,41 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTabSelected(int position) {
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
                 switch (position) {
                     case 0:
-                        if(mHomeFragment == null) {
+                        if (mHomeFragment == null) {
                             mHomeFragment = new HomeFragment();
                         }
-                        fragmentTransaction.replace(R.id.fragmentContainer, mHomeFragment);
+                        addFragment(mHomeFragment, "homeFragment");
                         break;
                     case 1:
-                        if(mHomeFragment == null) {
-                            mHomeFragment = new HomeFragment();
+                        if (mNearbyFragment == null) {
+                            mNearbyFragment = new NearbyFragment();
                         }
-                        fragmentTransaction.replace(R.id.fragmentContainer, mHomeFragment);
+                        Bundle bundle = new Bundle();
+                        bundle.putDouble("lat", lat);
+                        bundle.putDouble("lon", lon);
+                        mNearbyFragment.setArguments(bundle);
+                        addFragment(mNearbyFragment, "nearbyFragment");
                         break;
                     case 2:
-                        if(mHomeFragment == null) {
-                            mHomeFragment = new HomeFragment();
-                            fragmentTransaction.replace(R.id.fragmentContainer, mHomeFragment);
-                        }
+//                        if (mHomeFragment == null) {
+//                            mHomeFragment = new HomeFragment();
+//                        }
                         break;
                     case 3:
-                        if(mHomeFragment == null) {
-                            mHomeFragment = new HomeFragment();
-                        }
-                        fragmentTransaction.replace(R.id.fragmentContainer, mHomeFragment);
+//                        if (mHomeFragment == null) {
+//                            mHomeFragment = new HomeFragment();
+//                        }
                         break;
                     case 4:
-                        if(mMyFragment == null) {
+                        if (mMyFragment == null) {
                             mMyFragment = new MyFragment();
                         }
-                        fragmentTransaction.replace(R.id.fragmentContainer, mMyFragment);
+                        addFragment(mMyFragment, "myFragment");
                         break;
                 }
-                fragmentTransaction.commit();
             }
 
             @Override
@@ -104,6 +185,75 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
+    private void hideAllFragment(FragmentManager fragmentManager) {
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        if (mHomeFragment != null && !mHomeFragment.isHidden()) {
+            fragmentTransaction.hide(mHomeFragment);
+        }
+        if (mNearbyFragment != null && !mNearbyFragment.isHidden()) {
+            fragmentTransaction.hide(mNearbyFragment);
+        }
+        if (mMyFragment != null && !mMyFragment.isHidden()) {
+            fragmentTransaction.hide(mMyFragment);
+        }
+        fragmentTransaction.commitAllowingStateLoss();
+    }
+
+    private void addFragment(Fragment fragment, String tag) {
+        Fragment preFragment = mStack.pop();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        if (!fragment.isAdded() && null == fragmentManager.findFragmentByTag(tag)) {
+            fragmentManager.executePendingTransactions();
+            fragmentTransaction.hide(preFragment).add(R.id.fragmentContainer, fragment, tag);
+            fragmentTransaction.commitAllowingStateLoss();
+        } else {
+            fragmentTransaction.hide(preFragment).show(fragment);
+            fragmentTransaction.commitAllowingStateLoss();
+        }
+        mStack.push(fragment);
+    }
+
+    public class LocationListener implements BDLocationListener {
+        @Override
+        public void onReceiveLocation(BDLocation bdLocation) {
+            lon = bdLocation.getLongitude();
+            lat = bdLocation.getLatitude();
+            Log.i("MainActivity", "经度:" + bdLocation.getLongitude());
+            Log.i("MainActivity", "纬度:" + bdLocation.getLatitude());
+            if (BDLocation.TypeGpsLocation == bdLocation.getLocType()) {
+                Log.i("MainActivity", "定位方式:GPS");
+            } else if (BDLocation.TypeNetWorkLocation == bdLocation.getLocType()) {
+                Log.i("MainActivity", "定位方式:网络");
+            }
+            Log.i("MainActivity", "城市:" + bdLocation.getCity() + bdLocation.getCityCode());
+            Log.i("MainActivity", "区 :" + bdLocation.getDistrict());
+            Log.i("MainActivity", "街道 :" + bdLocation.getStreet());
+            Log.i("MainActivity", "楼 :" + bdLocation.getBuildingName());
+            if(mHomeFragment != null) {
+                TextView textView = mHomeFragment.getView().findViewById(R.id.title_tv);
+                textView.setText(bdLocation.getCity());
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mLocationClient.stop();
+    }
 }
