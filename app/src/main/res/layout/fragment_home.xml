@@ -19,14 +19,25 @@
                 android:gravity="center_vertical"
                 android:layout_marginRight="16dp">
 
-                <TextView
-                    android:id="@+id/title_tv"
+                <LinearLayout
+                    android:layout_height="match_parent"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_centerVertical="true"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/title_city"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@drawable/city_textview_selector"
+                        android:layout_centerVertical="true"
+                        android:clickable="true"
+                        android:onClick="cityTVClick"
+                        android:textSize="20dp" />
+                    <ImageView
+                        android:layout_marginLeft="-8dp"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_select"/>
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="1dp"

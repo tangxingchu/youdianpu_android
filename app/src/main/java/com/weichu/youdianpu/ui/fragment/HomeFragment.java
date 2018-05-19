@@ -21,16 +21,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static android.content.Context.SENSOR_SERVICE;
+
 /**
  * Created by Administrator on 2018/4/21.
  */
 
-public class HomeFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
-
-
+public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private RecyclerView mRecyclerView;
-
     private List<String> goodsList;
 
     private Context mContext;
@@ -50,6 +49,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
         initGoodsList();
         mContext = this.getContext();
         View view = inflater.inflate(R.layout.fragment_home, null);
+
         mRecyclerView = view.findViewById(R.id.rectclerView);
         mSwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -116,11 +116,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swip
     private void addMoreItem(List<String> newDatas) {
         goodsList.addAll(newDatas);
         mRecyclerViewAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onClick(View v) {
-
     }
 
     @Override

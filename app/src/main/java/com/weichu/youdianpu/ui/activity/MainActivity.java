@@ -1,10 +1,9 @@
 package com.weichu.youdianpu.ui.activity;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,22 +23,20 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
-import com.baidu.mapapi.map.Text;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.weichu.youdianpu.R;
 import com.weichu.youdianpu.ui.fragment.HomeFragment;
 import com.weichu.youdianpu.ui.fragment.MyFragment;
 import com.weichu.youdianpu.ui.fragment.NearbyFragment;
+import com.zaaach.citypicker.CityPicker;
+import com.zaaach.citypicker.model.LocatedCity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
+    private LocationListener mLocationListener = new LocationListener();
     private LocationClient mLocationClient;
     private HomeFragment mHomeFragment;
     private NearbyFragment mNearbyFragment;
@@ -48,16 +46,17 @@ public class MainActivity extends AppCompatActivity {
     private double lat;
 
     private Stack<Fragment> mStack = new Stack<Fragment>();
+    private LocatedCity mLocatedCity;
+    private FloatingActionButton mFaButton;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //百度定位
-        mLocationClient = new LocationClient(this.getApplicationContext());
-        mLocationClient.registerNotifyLocationListener(new LocationListener());
-        //百度地图
-        SDKInitializer.initialize(this.getApplicationContext());
         setContentView(R.layout.activity_main);
+        mFaButton = (FloatingActionButton) findViewById(R.id.fab);
+        //百度定位
+        mLocationClient = new LocationClient(this);
+        mLocationClient.registerLocationListener(mLocationListener);
         initUI();
         List<String> permissonList = new ArrayList<String>();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -81,7 +80,12 @@ public class MainActivity extends AppCompatActivity {
     private void requestLocation() {
         LocationClientOption locationClientOption = new LocationClientOption();
 //        locationClientOption.setScanSpan(1000 * 60 * 2);//2分钟定位1次
+//        locationClientOption.setScanSpan(1000);//1秒定位1次
+        locationClientOption.setOpenGps(true);
+        locationClientOption.setCoorType("bd09ll");
         locationClientOption.setIsNeedAddress(true);
+//        locationClientOption.setIsNeedAltitude(true);
+//        locationClientOption.setIsNeedLocationDescribe(true);
         mLocationClient.setLocOption(locationClientOption);
         mLocationClient.start();
     }
@@ -94,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults.length > 0) {
                     for (int result : grantResults) {
                         if (result != PackageManager.PERMISSION_GRANTED) {
-                            Toast.makeText(this, "同意位置权限能够享受更好的使用体验", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "同意位置权限能够享受更好的体验", Toast.LENGTH_LONG).show();
                             return;
                         }
                     }
@@ -112,11 +116,11 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationBar bottomNavigationBar = (BottomNavigationBar) findViewById(R.id.bottom_navigation_bar);
 
         bottomNavigationBar
-                .addItem(new BottomNavigationItem(R.drawable.ic_eighth, "首页"))
-                .addItem(new BottomNavigationItem(R.drawable.ic_fifth, "附近"))
-                .addItem(new BottomNavigationItem(R.drawable.ic_fourth, "Music"))
-                .addItem(new BottomNavigationItem(R.drawable.ic_third, "Movies & TV"))
-                .addItem(new BottomNavigationItem(R.drawable.ic_sixth, "我的"))
+                .addItem(new BottomNavigationItem(R.drawable.ic_home, "首页"))
+                .addItem(new BottomNavigationItem(R.drawable.ic_nearby, "附近"))
+                .addItem(new BottomNavigationItem(R.drawable.ic_shopping_cart, "购物袋"))
+                .addItem(new BottomNavigationItem(R.drawable.ic_order, "订单"))
+                .addItem(new BottomNavigationItem(R.drawable.ic_my, "我的"))
                 .setFirstSelectedPosition(0)
                 .setMode(BottomNavigationBar.MODE_FIXED)
                 .setBarBackgroundColor(R.color.white)
@@ -150,10 +154,6 @@ public class MainActivity extends AppCompatActivity {
                         if (mNearbyFragment == null) {
                             mNearbyFragment = new NearbyFragment();
                         }
-                        Bundle bundle = new Bundle();
-                        bundle.putDouble("lat", lat);
-                        bundle.putDouble("lon", lon);
-                        mNearbyFragment.setArguments(bundle);
                         addFragment(mNearbyFragment, "nearbyFragment");
                         break;
                     case 2:
@@ -218,6 +218,23 @@ public class MainActivity extends AppCompatActivity {
         mStack.push(fragment);
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.title_city:
+                Toast.makeText(this, "aaa", Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
+
+    public void cityTVClick(View view) {
+        CityPicker.getInstance()
+                .setFragmentManager(getSupportFragmentManager())
+                .enableAnimation(true)
+                .setLocatedCity(mLocatedCity)
+                .show();
+    }
+
     public class LocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
@@ -234,10 +251,13 @@ public class MainActivity extends AppCompatActivity {
             Log.i("MainActivity", "区 :" + bdLocation.getDistrict());
             Log.i("MainActivity", "街道 :" + bdLocation.getStreet());
             Log.i("MainActivity", "楼 :" + bdLocation.getBuildingName());
-            if(mHomeFragment != null) {
-                TextView textView = mHomeFragment.getView().findViewById(R.id.title_tv);
-                textView.setText(bdLocation.getCity());
+            String cityName = bdLocation.getCity().substring(0, bdLocation.getCity().length() - 1);
+            if(mHomeFragment != null && mHomeFragment.isVisible()) {
+                TextView textView = mHomeFragment.getView().findViewById(R.id.title_city);
+                textView.setText(cityName);
             }
+            mLocationClient.unRegisterLocationListener(mLocationListener);
+            mLocatedCity = new LocatedCity(cityName, bdLocation.getProvince(), bdLocation.getCityCode());
         }
     }
 
