@@ -123,8 +123,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .addItem(new BottomNavigationItem(R.drawable.ic_my, "我的"))
                 .setFirstSelectedPosition(0)
                 .setMode(BottomNavigationBar.MODE_FIXED)
-                .setBarBackgroundColor(R.color.white)
-                .setInActiveColor(R.color.black)
+                .setBarBackgroundColor(android.R.color.white)
+                .setInActiveColor(R.color.colorPrimaryText)
                 .setActiveColor(R.color.colorPrimary)
                 .initialise();
 

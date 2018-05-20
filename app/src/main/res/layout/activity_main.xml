@@ -30,9 +30,6 @@
         android:layout_marginBottom="76dp"
         android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
-        android:tint="@color/black"
-        android:src="@drawable/scanner"
-        android:elevation="6dp"
-        app:backgroundTint="@color/white"/>
+        android:src="@drawable/scanner"/>
 
 </android.support.design.widget.CoordinatorLayout>
