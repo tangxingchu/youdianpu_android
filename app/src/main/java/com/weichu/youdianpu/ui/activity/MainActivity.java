@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private IProfile profile = null;//登录用户信息
     private Drawer result = null;//嵌套抽屉
     private AccountHeader headerResult = null;//head头布局
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -95,8 +96,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        super.setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        super.setSupportActionBar(mToolbar);
 //        mDrawerLayout = (DrawerLayout) findViewById(R.id.main_drawerLayout);
         profile = getUserProfile();
         headerResult = new AccountHeaderBuilder()
@@ -122,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withAccountHeader(headerResult)
-                .withToolbar(toolbar)
+                .withToolbar(mToolbar)
                 .withActionBarDrawerToggle(true)
                 .build();
 //        ActionBar actionBar = getSupportActionBar();
@@ -131,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 //        }
 
-        mFaButton = (FloatingActionButton) findViewById(R.id.fab);
+        mFaButton = (FloatingActionButton) findViewById(R.id.main_fab);
         //百度定位
         mLocationClient = new LocationClient(this);
         mLocationClient.registerLocationListener(mLocationListener);
@@ -218,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .initialise();
 
 //        bottomNavigationBar.per
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        final FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         if (mHomeFragment == null) {
             mHomeFragment = new HomeFragment();

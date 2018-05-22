@@ -1,5 +1,6 @@
 package com.weichu.youdianpu.ui.fragment;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -73,6 +74,25 @@ public class NearbyFragment extends Fragment implements SensorEventListener {
         mLocClient.setLocOption(option);
         mLocClient.start();
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.getActivity().findViewById(R.id.main_toolbar).setVisibility(View.GONE);
+        this.getActivity().findViewById(R.id.main_fab).setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if(hidden) {
+            this.getActivity().findViewById(R.id.main_toolbar).setVisibility(View.VISIBLE);
+            this.getActivity().findViewById(R.id.main_fab).setVisibility(View.VISIBLE);
+        } else {
+            this.getActivity().findViewById(R.id.main_toolbar).setVisibility(View.GONE);
+            this.getActivity().findViewById(R.id.main_fab).setVisibility(View.GONE);
+        }
     }
 
     @Override
