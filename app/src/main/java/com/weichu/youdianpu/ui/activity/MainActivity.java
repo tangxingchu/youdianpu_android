@@ -22,10 +22,9 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.baidu.mapapi.SDKInitializer;
 import com.weichu.youdianpu.R;
 import com.weichu.youdianpu.ui.fragment.HomeFragment;
-import com.weichu.youdianpu.ui.fragment.MyFragment;
+import com.weichu.youdianpu.ui.fragment.MineFragment;
 import com.weichu.youdianpu.ui.fragment.NearbyFragment;
 import com.zaaach.citypicker.CityPicker;
 import com.zaaach.citypicker.model.LocatedCity;
@@ -36,15 +35,19 @@ import java.util.Stack;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
+    public static final String HOME_FRAGMENT = "homeFragment";
+    public static final String NEARBY_FRAGMENT = "nearbyFragment";
+    public static final String MINE_FRAGMENT = "mineFragment";
     private LocationListener mLocationListener = new LocationListener();
     private LocationClient mLocationClient;
     private HomeFragment mHomeFragment;
     private NearbyFragment mNearbyFragment;
-    private MyFragment mMyFragment;
+    private MineFragment mMineFragment;
     private static final int REQUESTCODE_MAP = 1;
     private double lon;
     private double lat;
 
+    private int mBNBPostion = 0;//默认是选中首页
     private Stack<Fragment> mStack = new Stack<Fragment>();
     private LocatedCity mLocatedCity;
     private FloatingActionButton mFaButton;
@@ -52,6 +55,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if(savedInstanceState != null) {
+            //当activity被系统销毁，获取到之前的fragment，并且移除之前的fragment的状态
+            mHomeFragment = (HomeFragment) fragmentManager.findFragmentByTag(HOME_FRAGMENT);
+            mNearbyFragment = (NearbyFragment) fragmentManager.findFragmentByTag(NEARBY_FRAGMENT);
+            mMineFragment = (MineFragment) fragmentManager.findFragmentByTag(MINE_FRAGMENT);
+//            fragmentManager.beginTransaction().remove(mHomeFragment).commit();
+//            fragmentManager.beginTransaction().remove(mNearbyFragment).commit();
+//            fragmentManager.beginTransaction().remove(mMineFragment).commit();
+            mBNBPostion = savedInstanceState.getInt("BNBPostion", 0);
+            switch (mBNBPostion) {
+                case 0:
+                    mStack.push(mHomeFragment);
+                    break;
+                case 1:
+                    mStack.push(mNearbyFragment);
+                    break;
+                case 4:
+                    mStack.push(mMineFragment);
+                    break;
+            }
+        }
         setContentView(R.layout.activity_main);
         mFaButton = (FloatingActionButton) findViewById(R.id.fab);
         //百度定位
@@ -121,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .addItem(new BottomNavigationItem(R.drawable.ic_shopping_cart, "购物袋"))
                 .addItem(new BottomNavigationItem(R.drawable.ic_order, "订单"))
                 .addItem(new BottomNavigationItem(R.drawable.ic_my, "我的"))
-                .setFirstSelectedPosition(0)
+                .setFirstSelectedPosition(mBNBPostion)
                 .setMode(BottomNavigationBar.MODE_FIXED)
                 .setBarBackgroundColor(android.R.color.white)
                 .setInActiveColor(R.color.colorPrimaryText)
@@ -133,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         if (mHomeFragment == null) {
             mHomeFragment = new HomeFragment();
-            fragmentTransaction.add(R.id.fragmentContainer, mHomeFragment, "homeFragment");
+            fragmentTransaction.add(R.id.fragmentContainer, mHomeFragment, HOME_FRAGMENT);
             mStack.push(mHomeFragment);
         }
         fragmentTransaction.commit();
@@ -148,13 +173,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (mHomeFragment == null) {
                             mHomeFragment = new HomeFragment();
                         }
-                        addFragment(mHomeFragment, "homeFragment");
+                        addFragment(mHomeFragment, HOME_FRAGMENT);
                         break;
                     case 1:
                         if (mNearbyFragment == null) {
                             mNearbyFragment = new NearbyFragment();
                         }
-                        addFragment(mNearbyFragment, "nearbyFragment");
+                        addFragment(mNearbyFragment, NEARBY_FRAGMENT);
                         break;
                     case 2:
 //                        if (mHomeFragment == null) {
@@ -167,12 +192,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                        }
                         break;
                     case 4:
-                        if (mMyFragment == null) {
-                            mMyFragment = new MyFragment();
+                        if (mMineFragment == null) {
+                            mMineFragment = new MineFragment();
                         }
-                        addFragment(mMyFragment, "myFragment");
+                        addFragment(mMineFragment, MINE_FRAGMENT);
                         break;
                 }
+                mBNBPostion = position;
             }
 
             @Override
@@ -197,8 +223,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (mNearbyFragment != null && !mNearbyFragment.isHidden()) {
             fragmentTransaction.hide(mNearbyFragment);
         }
-        if (mMyFragment != null && !mMyFragment.isHidden()) {
-            fragmentTransaction.hide(mMyFragment);
+        if (mMineFragment != null && !mMineFragment.isHidden()) {
+            fragmentTransaction.hide(mMineFragment);
         }
         fragmentTransaction.commitAllowingStateLoss();
     }
@@ -252,19 +278,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.i("MainActivity", "街道 :" + bdLocation.getStreet());
             Log.i("MainActivity", "楼 :" + bdLocation.getBuildingName());
             String cityName = bdLocation.getCity().substring(0, bdLocation.getCity().length() - 1);
-            if(mHomeFragment != null && mHomeFragment.isVisible()) {
-                TextView textView = mHomeFragment.getView().findViewById(R.id.title_city);
-                textView.setText(cityName);
-            }
+            TextView textView = (TextView) findViewById(R.id.title_city);
+            textView.setText(cityName);
             mLocationClient.unRegisterLocationListener(mLocationListener);
             mLocatedCity = new LocatedCity(cityName, bdLocation.getProvince(), bdLocation.getCityCode());
         }
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("BNBPostion", mBNBPostion);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
     }
+
 
     @Override
     protected void onStop() {

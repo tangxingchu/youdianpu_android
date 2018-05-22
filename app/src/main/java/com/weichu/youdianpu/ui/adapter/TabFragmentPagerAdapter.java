@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 
 import com.weichu.youdianpu.ui.fragment.HomeFragment;
 import com.weichu.youdianpu.ui.fragment.MoreFragment;
-import com.weichu.youdianpu.ui.fragment.MyFragment;
+import com.weichu.youdianpu.ui.fragment.MineFragment;
 import com.weichu.youdianpu.ui.fragment.NearbyFragment;
 import com.weichu.youdianpu.ui.fragment.OrderFragment;
 
@@ -27,7 +27,7 @@ public class TabFragmentPagerAdapter extends FragmentPagerAdapter {
         HomeFragment homeFragment = new HomeFragment();
         NearbyFragment nearbyFragment = new NearbyFragment();
         OrderFragment orderFragment = new OrderFragment();
-        MyFragment myFragment = new MyFragment();
+        MineFragment myFragment = new MineFragment();
         MoreFragment moreFragment = new MoreFragment();
         this.mList = new ArrayList<Fragment>();
         this.mList.add(homeFragment);

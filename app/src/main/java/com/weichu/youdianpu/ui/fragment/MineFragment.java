@@ -9,9 +9,9 @@ import com.weichu.youdianpu.R;
  * Created by tangxingchu on 2018/4/12.
  */
 
-public class MyFragment extends BaseFragment {
+public class MineFragment extends BaseFragment {
 
-    private static final String TAG = MyFragment.class.getSimpleName();
+    private static final String TAG = MineFragment.class.getSimpleName();
 
     @Override
     protected void loadData() {
