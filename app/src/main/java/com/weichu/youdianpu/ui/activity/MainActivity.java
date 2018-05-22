@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //请求位置信息
             requestLocation();
         }
+
     }
 
     private void requestLocation() {

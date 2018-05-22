@@ -8,6 +8,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -55,6 +56,8 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mSwipeRefreshLayout.setOnRefreshListener(this);
         mLinearLayoutManager = new LinearLayoutManager(mContext);
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+//        GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 2);
+//        mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerViewAdapter = new RecyclerViewAdapter();
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
