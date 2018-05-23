@@ -247,11 +247,11 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if(hidden) {
-            this.getActivity().findViewById(R.id.main_toolbar).setVisibility(View.GONE);
-            this.getActivity().findViewById(R.id.main_fab).setVisibility(View.GONE);
+//            this.getActivity().findViewById(R.id.main_toolbar).setVisibility(View.GONE);
+//            this.getActivity().findViewById(R.id.main_fab).setVisibility(View.GONE);
         } else {
-            this.getActivity().findViewById(R.id.main_toolbar).setVisibility(View.VISIBLE);
-            this.getActivity().findViewById(R.id.main_fab).setVisibility(View.VISIBLE);
+//            this.getActivity().findViewById(R.id.main_toolbar).setVisibility(View.VISIBLE);
+//            this.getActivity().findViewById(R.id.main_fab).setVisibility(View.VISIBLE);
         }
     }
 }
