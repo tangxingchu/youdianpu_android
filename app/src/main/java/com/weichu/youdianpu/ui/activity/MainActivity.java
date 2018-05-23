@@ -212,10 +212,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .addItem(new BottomNavigationItem(R.drawable.ic_order, "订单"))
 //                .addItem(new BottomNavigationItem(R.drawable.ic_my, "我的"))
                 .setFirstSelectedPosition(mBNBPostion)
-                .setMode(BottomNavigationBar.MODE_FIXED)
-                .setBarBackgroundColor(android.R.color.white)
+                //.setMode(BottomNavigationBar.MODE_FIXED)
+                .setMode(BottomNavigationBar.MODE_SHIFTING)
+                //MODE_SHIFTING模式 默认使用 BACKGROUND_STYLE_RIPPLE
+                //mode设为MODE_FIXED，默认使用BACKGROUND_STYLE_STATIC
+                //in-active color：图标和文本未被激活或选中的颜色；默认颜色为Theme’s Primary Color
+                //active color : 在BACKGROUND_STYLE_STATIC下，为图标和文本激活或选中的颜色；在BACKGROUND_STYLE_RIPPLE下，为整个控件的背景颜色；默认颜色为Color.LTGRAY
+                //background color :在BACKGROUND_STYLE_STATIC 下，为整个空控件的背景色；在 BACKGROUND_STYLE_RIPPLE 下为图标和文本被激活或选中的颜色；默认颜色为Color.WHITE
+                //.setBarBackgroundColor(android.R.color.white)
+                .setBarBackgroundColor(R.color.colorPrimary)
                 .setInActiveColor(R.color.colorPrimaryText)
-                .setActiveColor(R.color.colorPrimary)
+                .setActiveColor(android.R.color.white)
+                //.setActiveColor(R.color.colorPrimary)
                 .initialise();
 
 //        bottomNavigationBar.per
