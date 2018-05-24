@@ -27,7 +27,7 @@
             android:value="a620bMVeBGipcIkurcPITgcOdXouHIvT"
             />
 
-        <activity android:name=".ui.activity.MainActivity" android:theme="@style/CustomCityPickerTheme">
+        <activity android:name=".ui.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

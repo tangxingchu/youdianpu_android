@@ -2,6 +2,9 @@ package com.weichu.youdianpu.ui.activity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -14,11 +17,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,14 +33,19 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.typeface.ITypeface;
+import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.weichu.youdianpu.R;
 import com.weichu.youdianpu.ui.fragment.HomeFragment;
+import com.weichu.youdianpu.ui.fragment.HomeTabFragment;
 import com.weichu.youdianpu.ui.fragment.MineFragment;
 import com.weichu.youdianpu.ui.fragment.NearbyFragment;
 import com.zaaach.citypicker.CityPicker;
@@ -45,14 +55,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, HomeTabFragment.OnFragmentInteractionListener {
 
-    public static final String HOME_FRAGMENT = "homeFragment";
-    public static final String NEARBY_FRAGMENT = "nearbyFragment";
-    public static final String MINE_FRAGMENT = "mineFragment";
+    private static final String HOME_FRAGMENT = "homeFragment";
+    private static final String HOME_TAB_FRAGMENT = "homeTabFragment";
+    private static final String NEARBY_FRAGMENT = "nearbyFragment";
+    private static final String MINE_FRAGMENT = "mineFragment";
     private LocationListener mLocationListener = new LocationListener();
     private LocationClient mLocationClient;
-    private HomeFragment mHomeFragment;
+//    private HomeFragment mHomeFragment;
+    private HomeTabFragment mHomeTabFragment;
     private NearbyFragment mNearbyFragment;
     private MineFragment mMineFragment;
     private static final int REQUESTCODE_MAP = 1;
@@ -76,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FragmentManager fragmentManager = getSupportFragmentManager();
         if(savedInstanceState != null) {
             //当activity被系统销毁，获取到之前的fragment，并且移除之前的fragment的状态
-            mHomeFragment = (HomeFragment) fragmentManager.findFragmentByTag(HOME_FRAGMENT);
+            mHomeTabFragment = (HomeTabFragment) fragmentManager.findFragmentByTag(HOME_TAB_FRAGMENT);
             mNearbyFragment = (NearbyFragment) fragmentManager.findFragmentByTag(NEARBY_FRAGMENT);
             mMineFragment = (MineFragment) fragmentManager.findFragmentByTag(MINE_FRAGMENT);
 //            fragmentManager.beginTransaction().remove(mHomeFragment).commit();
@@ -85,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mBNBPostion = savedInstanceState.getInt("BNBPostion", 0);
             switch (mBNBPostion) {
                 case 0:
-                    mStack.push(mHomeFragment);
+                    mStack.push(mHomeTabFragment);
                     break;
                 case 1:
                     mStack.push(mNearbyFragment);
@@ -96,12 +108,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         setContentView(R.layout.activity_main);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WindowManager.LayoutParams localLayoutParams = getWindow().getAttributes();
+            localLayoutParams.flags = (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags);
+        }
         mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         super.setSupportActionBar(mToolbar);
 //        mDrawerLayout = (DrawerLayout) findViewById(R.id.main_drawerLayout);
         profile = getUserProfile();
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
+                .withDividerBelowHeader(false)
                 .withHeaderBackground(R.drawable.header)
                 .withTranslucentStatusBar(true) //半透明效果
                 .addProfiles(profile)
@@ -122,9 +139,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build();//至此头布局head构建完成
         result = new DrawerBuilder()
                 .withActivity(this)
+//                .withRootView(R.id.main_frameLayout)
                 .withAccountHeader(headerResult)
                 .withToolbar(mToolbar)
                 .withActionBarDrawerToggle(true)
+                .withTranslucentStatusBar(true)
                 .build();
 //        ActionBar actionBar = getSupportActionBar();
 //        if(actionBar != null) {
@@ -208,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bottomNavigationBar
                 .addItem(new BottomNavigationItem(R.drawable.ic_home, "首页"))
                 .addItem(new BottomNavigationItem(R.drawable.ic_nearby, "附近"))
-                .addItem(new BottomNavigationItem(R.drawable.ic_shopping_cart, "购物袋"))
+//                .addItem(new BottomNavigationItem(R.drawable.ic_shopping_cart, "购物袋"))
                 .addItem(new BottomNavigationItem(R.drawable.ic_order, "订单"))
 //                .addItem(new BottomNavigationItem(R.drawable.ic_my, "我的"))
                 .setFirstSelectedPosition(mBNBPostion)
@@ -229,10 +248,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        bottomNavigationBar.per
         final FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        if (mHomeFragment == null) {
-            mHomeFragment = new HomeFragment();
-            fragmentTransaction.add(R.id.fragmentContainer, mHomeFragment, HOME_FRAGMENT);
-            mStack.push(mHomeFragment);
+        if (mHomeTabFragment == null) {
+            mHomeTabFragment = new HomeTabFragment();
+            fragmentTransaction.add(R.id.fragmentContainer, mHomeTabFragment, HOME_FRAGMENT);
+            mStack.push(mHomeTabFragment);
         }
         fragmentTransaction.commit();
 
@@ -243,10 +262,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 switch (position) {
                     case 0:
-                        if (mHomeFragment == null) {
-                            mHomeFragment = new HomeFragment();
+                        if (mHomeTabFragment == null) {
+                            mHomeTabFragment = new HomeTabFragment();
                         }
-                        addFragment(mHomeFragment, HOME_FRAGMENT);
+                        addFragment(mHomeTabFragment, HOME_FRAGMENT);
                         break;
                     case 1:
                         if (mNearbyFragment == null) {
@@ -290,8 +309,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void hideAllFragment(FragmentManager fragmentManager) {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        if (mHomeFragment != null && !mHomeFragment.isHidden()) {
-            fragmentTransaction.hide(mHomeFragment);
+        if (mHomeTabFragment != null && !mHomeTabFragment.isHidden()) {
+            fragmentTransaction.hide(mHomeTabFragment);
         }
         if (mNearbyFragment != null && !mNearbyFragment.isHidden()) {
             fragmentTransaction.hide(mNearbyFragment);
@@ -336,7 +355,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-       getMenuInflater().inflate(R.menu.toolbar, menu);
+        getMenuInflater().inflate(R.menu.toolbar, menu);
+        menu.findItem(R.id.menu_search).setIcon(
+                new IconicsDrawable(this, MaterialDesignIconic.Icon.gmi_search)
+                        .color(Color.WHITE)
+                        .sizeDp(24)
+                        .respectFontBounds(true));
+        final SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return true;
+            }
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return true;
+            }
+        });
         return true;
     }
 
@@ -375,6 +410,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mLocationClient.unRegisterLocationListener(mLocationListener);
             mLocatedCity = new LocatedCity(cityName, bdLocation.getProvince(), bdLocation.getCityCode());
         }
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+        //TODO fragment与activity通讯
     }
 
     @Override
