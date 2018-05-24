@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -12,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.astuetz.PagerSlidingTabStrip;
 import com.weichu.youdianpu.R;
 
 /**
@@ -37,7 +37,7 @@ public class HomeTabFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
 
-    private PagerSlidingTabStrip mTabStrip;
+    private TabLayout mTabLayout;
     private ViewPager mViewPager;
     private MyPagerAdapter mPagerAdapter;
 
@@ -78,13 +78,12 @@ public class HomeTabFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_tab, container, false);
-        mTabStrip = view.findViewById(R.id.home_tabs);
+        mTabLayout = view.findViewById(R.id.home_tabLayout);
         mViewPager = view.findViewById(R.id.home_pager);
         mPagerAdapter = new MyPagerAdapter(getActivity().getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
-        mTabStrip.setViewPager(mViewPager);
-        mTabStrip.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         mViewPager.setCurrentItem(0);
+        mTabLayout.setupWithViewPager(mViewPager);
         return view;
     }
 

@@ -8,8 +8,11 @@
               tools:context=".ui.fragment.HomeTabFragment">
 
     <android.support.design.widget.TabLayout
+        android:id="@+id/home_tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="48dp">
+        android:layout_height="48dp"
+        app:tabTextColor="@color/colorSecondaryText"
+        app:tabSelectedTextColor="@color/colorPrimaryText">
         <android.support.design.widget.TabItem
             android:layout_width="match_parent"
             android:layout_height="match_parent"
