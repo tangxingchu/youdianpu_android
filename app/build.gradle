@@ -35,6 +35,8 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.10.0'
     compile "com.mikepenz:iconics-core:3.0.3@aar"
     compile "com.mikepenz:material-design-iconic-typeface:2.2.0.4@aar"
+    compile 'com.lsjwzh:materialloadingprogressbar:0.5.8-RELEASE'
+    compile 'com.kogitune:pre-lollipop-activity-transition:1.+'
     compile('com.mikepenz:materialdrawer:6.0.2@aar') {
         transitive = true
     }

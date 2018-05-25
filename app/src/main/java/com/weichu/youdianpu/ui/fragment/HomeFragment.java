@@ -1,22 +1,26 @@
 package com.weichu.youdianpu.ui.fragment;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.kogitune.activity_transition.ActivityTransitionLauncher;
 import com.weichu.youdianpu.R;
+import com.weichu.youdianpu.ui.activity.MerchantProfileActivity;
+import com.weichu.youdianpu.ui.adapter.HomeRecommendAdapter;
+import com.weichu.youdianpu.ui.listener.OnRecylerViewItemClickListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,14 +32,14 @@ import static android.content.Context.SENSOR_SERVICE;
  * Created by Administrator on 2018/4/21.
  */
 
-public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, HomeRecommendAdapter.OnItemClickListener {
 
     private RecyclerView mRecyclerView;
     private List<String> goodsList;
 
     private Context mContext;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private RecyclerViewAdapter mRecyclerViewAdapter;
+    private HomeRecommendAdapter mHomeRecommendAdapter;
 
     private Handler mHandler;
 
@@ -59,9 +63,9 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 //        GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 2);
 //        mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mRecyclerViewAdapter = new RecyclerViewAdapter();
-        mRecyclerView.setAdapter(mRecyclerViewAdapter);
-        mHandler = new Handler(){
+        mHomeRecommendAdapter = new HomeRecommendAdapter(mContext, goodsList, null);
+        mRecyclerView.setAdapter(mHomeRecommendAdapter);
+        mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 int what = msg.what;
@@ -69,7 +73,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     case RERESH_LAYOUT:
                         mSwipeRefreshLayout.setRefreshing(false);
                         addGoods();
-                        mRecyclerViewAdapter.notifyDataSetChanged();
+                        mHomeRecommendAdapter.notifyDataSetChanged();
                         break;
                     default:
                         break;
@@ -81,16 +85,16 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 //判断是否滚动到最后一条记录
-                if(newState == RecyclerView.SCROLL_STATE_IDLE && mLastVisibleItem + 1 == mRecyclerViewAdapter.getItemCount()) {
-                    if(mRecyclerViewAdapter.mLoadMoreStatus == RecyclerViewAdapter.LOADING_MORE) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE && mLastVisibleItem + 1 == mHomeRecommendAdapter.getItemCount()) {
+                    if (mHomeRecommendAdapter.getLoadMoreStatus() == mHomeRecommendAdapter.LOADING_MORE) {
                         return;
                     }
-                    mRecyclerViewAdapter.changeMoreStatus(RecyclerViewAdapter.LOADING_MORE);
+                    mHomeRecommendAdapter.changeMoreStatus(mHomeRecommendAdapter.LOADING_MORE);
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             addMoreItem(Arrays.asList("more Item1", "more Item2", "more Item3", "more Item4", "more Item5"));
-                            mRecyclerViewAdapter.changeMoreStatus(RecyclerViewAdapter.PULLUP_LOAD_MORE);
+                            mHomeRecommendAdapter.changeMoreStatus(HomeRecommendAdapter.PULLUP_LOAD_MORE);
                         }
                     }, 1000);
                 }
@@ -102,12 +106,40 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 mLastVisibleItem = mLinearLayoutManager.findLastVisibleItemPosition();
             }
         });
+
+        //为什么设置ViewHolder的item的OnClickListener没有作用?
+        mRecyclerView.addOnItemTouchListener(new OnRecylerViewItemClickListener(mRecyclerView) {
+            @Override
+            public void onItemClick(RecyclerView.ViewHolder vh) {
+                //Toast.makeText(mContext,vh.getAdapterPosition()+"", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(HomeFragment.this.getActivity(), MerchantProfileActivity.class);
+//                intent.putE
+//                mContext.startActivity(intent);
+                ImageView imageView = vh.itemView.findViewById(R.id.goods_image);
+                ActivityTransitionLauncher.with(HomeFragment.this.getActivity()).from(imageView).launch(intent);
+            }
+
+            @Override
+            public void onItemLongClick(RecyclerView.ViewHolder vh) {
+                if (vh.getLayoutPosition() != goodsList.size() - 1) {
+//                    helper.startDrag(vh);
+                }
+                //Toast.makeText(mContext,vh.getAdapterPosition()+"buke",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+//        mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                return false;
+//            }
+//        });
         return view;
     }
 
     private void initGoodsList() {
         goodsList = new ArrayList<String>();
-        for(int i = 0; i < 30; i++) {
+        for (int i = 0; i < 30; i++) {
             goodsList.add("商品" + i);
         }
     }
@@ -118,12 +150,17 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void addMoreItem(List<String> newDatas) {
         goodsList.addAll(newDatas);
-        mRecyclerViewAdapter.notifyDataSetChanged();
+        mHomeRecommendAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        Toast.makeText(this.mContext, "aaaa", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onRefresh() {
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 super.run();
@@ -139,105 +176,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         }.start();
     }
 
-    public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-        private static final int TYPE_ITEM = 0; //普通的itemVIew
-        private static final int TYPE_FOOTER = 1;//底部footerView
-
-        //上拉加载更多
-        public static final int PULLUP_LOAD_MORE = 0;
-        //正在加载中
-        public static final int LOADING_MORE     = 1;
-        //没有加载更多 隐藏
-        public static final int NO_LOAD_MORE     = 2;
-
-        //上拉加载更多状态-默认为0
-        private int mLoadMoreStatus = 0;
-
-        @Override
-        public int getItemViewType(int position) {
-            if(position  == this.getItemCount() - 1) {
-                return TYPE_FOOTER;
-            } else {
-                return TYPE_ITEM;
-            }
-        }
-
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            if(viewType == TYPE_ITEM) {
-                View view = LayoutInflater.from(mContext).inflate(R.layout.item_goods, parent, false);
-                ViewHolder viewHolder = new ViewHolder(view);
-                return viewHolder;
-            } else {
-                View view = LayoutInflater.from(mContext).inflate(R.layout.item_footer, parent, false);
-                view.setBackgroundColor(Color.RED);
-                FooterHolder footerHolder = new FooterHolder(view);
-                return footerHolder;
-            }
-//            View view = LayoutInflater.from(mContext).inflate(R.layout.item_goods, parent, false);
-//            ViewHolder viewHolder = new ViewHolder(view);
-//            return viewHolder;
-        }
-
-        @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            if(holder instanceof ViewHolder) {
-                String item = goodsList.get(position);
-                ((ViewHolder) holder).mTextView.setText(item);
-            } else if(holder instanceof FooterHolder) {
-                switch (mLoadMoreStatus) {
-                    case PULLUP_LOAD_MORE:
-                        ((FooterHolder) holder).mTextView.setText("上拉加载更多...");
-                        break;
-                    case LOADING_MORE:
-                        ((FooterHolder) holder).mTextView.setText("正在加载...");
-                        break;
-                    case NO_LOAD_MORE:
-                        //隐藏加载更多
-                        ((FooterHolder) holder).mTextView.setVisibility(View.GONE);
-                        break;
-                }
-            }
-//            String item = goodsList.get(position);
-//            ((ViewHolder) holder).mTextView.setText(item);
-        }
-
-        @Override
-        public int getItemCount() {
-            //+1 做为footerView
-            return goodsList.size() + 1;
-        }
-
-        public void changeMoreStatus(int status) {
-            this.mLoadMoreStatus = status;
-            this.notifyDataSetChanged();
-        }
-
-    }
-
-
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
-
-        private TextView mTextView;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            mTextView = itemView.findViewById(R.id.goodsName);
-        }
-    }
-
-    public class FooterHolder extends RecyclerView.ViewHolder {
-
-        private TextView mTextView;
-
-        public FooterHolder(View itemView) {
-            super(itemView);
-            mTextView = itemView.findViewById(R.id.footerTextView);
-        }
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -246,7 +184,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if(hidden) {
+        if (hidden) {
 //            this.getActivity().findViewById(R.id.main_toolbar).setVisibility(View.GONE);
             this.getActivity().findViewById(R.id.main_fab).setVisibility(View.GONE);
         } else {

@@ -115,36 +115,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         super.setSupportActionBar(mToolbar);
 //        mDrawerLayout = (DrawerLayout) findViewById(R.id.main_drawerLayout);
-        profile = getUserProfile();
-        headerResult = new AccountHeaderBuilder()
-                .withActivity(this)
-                .withDividerBelowHeader(false)
-                .withHeaderBackground(R.drawable.header)
-                .withTranslucentStatusBar(true) //半透明效果
-                .addProfiles(profile)
-                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
-                    @Override
-                    public boolean onProfileChanged(View view, IProfile profile, boolean current) {
-                        switch ((int) profile.getIdentifier()) {
-                            case 101://根据不同标识符监听不同对象
-                                Toast.makeText(MainActivity.this, "头像被点击", Toast.LENGTH_SHORT).show();
-                                break;
-                            default:
-                                break;
-                        }
-                        return false;
-                    }
-                })
-                .withSavedInstance(savedInstanceState)
-                .build();//至此头布局head构建完成
-        result = new DrawerBuilder()
-                .withActivity(this)
-//                .withRootView(R.id.main_frameLayout)
-                .withAccountHeader(headerResult)
-                .withToolbar(mToolbar)
-                .withActionBarDrawerToggle(true)
-                .withTranslucentStatusBar(true)
-                .build();
+//        profile = getUserProfile();
+//        headerResult = new AccountHeaderBuilder()
+//                .withActivity(this)
+//                .withDividerBelowHeader(false)
+//                .withHeaderBackground(R.drawable.header)
+//                .withTranslucentStatusBar(true) //半透明效果
+//                .addProfiles(profile)
+//                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+//                    @Override
+//                    public boolean onProfileChanged(View view, IProfile profile, boolean current) {
+//                        switch ((int) profile.getIdentifier()) {
+//                            case 101://根据不同标识符监听不同对象
+//                                Toast.makeText(MainActivity.this, "头像被点击", Toast.LENGTH_SHORT).show();
+//                                break;
+//                            default:
+//                                break;
+//                        }
+//                        return false;
+//                    }
+//                })
+//                .withSavedInstance(savedInstanceState)
+//                .build();//至此头布局head构建完成
+//        result = new DrawerBuilder()
+//                .withActivity(this)
+////                .withRootView(R.id.main_frameLayout)
+//                .withAccountHeader(headerResult)
+//                .withToolbar(mToolbar)
+//                .withActionBarDrawerToggle(true)
+//                .withTranslucentStatusBar(true)
+//                .build();
 //        ActionBar actionBar = getSupportActionBar();
 //        if(actionBar != null) {
 //            actionBar.setDisplayHomeAsUpEnabled(true);
@@ -415,6 +415,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onFragmentInteraction(Uri uri) {
         //TODO fragment与activity通讯
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (result.isDrawerOpen()) {
+            result.closeDrawer();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override

@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.weichu.youdianpu.R;
+import com.weichu.youdianpu.ui.adapter.HomePagerAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -39,7 +40,7 @@ public class HomeTabFragment extends Fragment {
 
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
-    private MyPagerAdapter mPagerAdapter;
+    private HomePagerAdapter mPagerAdapter;
 
 
     /**
@@ -80,7 +81,7 @@ public class HomeTabFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home_tab, container, false);
         mTabLayout = view.findViewById(R.id.home_tabLayout);
         mViewPager = view.findViewById(R.id.home_pager);
-        mPagerAdapter = new MyPagerAdapter(getActivity().getSupportFragmentManager());
+        mPagerAdapter = new HomePagerAdapter(getActivity().getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setCurrentItem(0);
         mTabLayout.setupWithViewPager(mViewPager);
@@ -125,30 +126,5 @@ public class HomeTabFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
-    public class MyPagerAdapter extends FragmentPagerAdapter {
-
-        private final String[] TITLES = {"我关注的", "推荐", "最近浏览"};
-
-        MyPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return TITLES[position];
-        }
-
-        @Override
-        public int getCount() {
-            return TITLES.length;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return new HomeFragment();
-        }
-    }
-
 
 }
