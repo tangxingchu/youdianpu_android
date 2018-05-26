@@ -1,6 +1,7 @@
 package com.weichu.youdianpu.ui.activity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
@@ -108,10 +109,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         setContentView(R.layout.activity_main);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            WindowManager.LayoutParams localLayoutParams = getWindow().getAttributes();
-            localLayoutParams.flags = (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags);
-        }
+        //沉浸式状态栏
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            WindowManager.LayoutParams localLayoutParams = getWindow().getAttributes();
+//            localLayoutParams.flags = (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags);
+//        }
         mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         super.setSupportActionBar(mToolbar);
 //        mDrawerLayout = (DrawerLayout) findViewById(R.id.main_drawerLayout);
@@ -152,6 +154,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        }
 
         mFaButton = (FloatingActionButton) findViewById(R.id.main_fab);
+        mFaButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, QrCodeScannerActivity.class);
+                startActivityForResult(intent, 2);
+            }
+        });
         //百度定位
         mLocationClient = new LocationClient(this);
         mLocationClient.registerLocationListener(mLocationListener);
@@ -231,18 +240,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .addItem(new BottomNavigationItem(R.drawable.ic_order, "订单"))
 //                .addItem(new BottomNavigationItem(R.drawable.ic_my, "我的"))
                 .setFirstSelectedPosition(mBNBPostion)
-                //.setMode(BottomNavigationBar.MODE_FIXED)
-                .setMode(BottomNavigationBar.MODE_SHIFTING)
+                .setMode(BottomNavigationBar.MODE_FIXED)
+//                .setMode(BottomNavigationBar.MODE_SHIFTING)
                 //MODE_SHIFTING模式 默认使用 BACKGROUND_STYLE_RIPPLE
                 //mode设为MODE_FIXED，默认使用BACKGROUND_STYLE_STATIC
                 //in-active color：图标和文本未被激活或选中的颜色；默认颜色为Theme’s Primary Color
                 //active color : 在BACKGROUND_STYLE_STATIC下，为图标和文本激活或选中的颜色；在BACKGROUND_STYLE_RIPPLE下，为整个控件的背景颜色；默认颜色为Color.LTGRAY
                 //background color :在BACKGROUND_STYLE_STATIC 下，为整个空控件的背景色；在 BACKGROUND_STYLE_RIPPLE 下为图标和文本被激活或选中的颜色；默认颜色为Color.WHITE
-                //.setBarBackgroundColor(android.R.color.white)
-                .setBarBackgroundColor(R.color.colorPrimary)
+                .setBarBackgroundColor(android.R.color.white)
+//                .setBarBackgroundColor(R.color.colorPrimary)
                 .setInActiveColor(R.color.colorPrimaryText)
-                .setActiveColor(android.R.color.white)
-                //.setActiveColor(R.color.colorPrimary)
+//                .setActiveColor(android.R.color.white)
+                .setActiveColor(R.color.colorPrimary)
                 .initialise();
 
 //        bottomNavigationBar.per

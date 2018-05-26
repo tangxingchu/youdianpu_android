@@ -9,12 +9,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.weichu.youdianpu.R;
 import com.weichu.youdianpu.ui.adapter.HomePagerAdapter;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,8 +42,11 @@ public class HomeTabFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
 
-    private TabLayout mTabLayout;
-    private ViewPager mViewPager;
+    @BindView(R.id.home_tabLayout)
+    TabLayout mTabLayout;
+    @BindView(R.id.home_pager)
+    ViewPager mViewPager;
+
     private HomePagerAdapter mPagerAdapter;
 
 
@@ -72,6 +79,9 @@ public class HomeTabFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        if(savedInstanceState != null) {
+            Log.i("HomeTabFragment", "rrrr");
+        }
     }
 
     @Override
@@ -79,8 +89,7 @@ public class HomeTabFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_tab, container, false);
-        mTabLayout = view.findViewById(R.id.home_tabLayout);
-        mViewPager = view.findViewById(R.id.home_pager);
+        ButterKnife.bind(this, view);
         mPagerAdapter = new HomePagerAdapter(getActivity().getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setCurrentItem(0);

@@ -80,7 +80,8 @@ public class NearbyFragment extends Fragment implements SensorEventListener {
     public void onAttach(Context context) {
         super.onAttach(context);
 //        this.getActivity().findViewById(R.id.main_toolbar).setVisibility(View.GONE);
-        this.getActivity().findViewById(R.id.main_fab).setVisibility(View.GONE);
+        if(this.getActivity().findViewById(R.id.main_fab) != null)
+            this.getActivity().findViewById(R.id.main_fab).setVisibility(View.GONE);
     }
 
     @Override

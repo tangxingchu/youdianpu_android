@@ -1,5 +1,7 @@
 package com.weichu.youdianpu.ui.fragment;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +37,7 @@ import static android.content.Context.SENSOR_SERVICE;
 
 public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, HomeRecommendAdapter.OnItemClickListener {
 
+    private static final int REQUEST_CODE_VIEW_SHOT = 101;
     private RecyclerView mRecyclerView;
     private List<String> goodsList;
 
@@ -111,12 +115,20 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mRecyclerView.addOnItemTouchListener(new OnRecylerViewItemClickListener(mRecyclerView) {
             @Override
             public void onItemClick(RecyclerView.ViewHolder vh) {
+                Activity host = HomeFragment.this.getActivity();
                 //Toast.makeText(mContext,vh.getAdapterPosition()+"", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(HomeFragment.this.getActivity(), MerchantProfileActivity.class);
 //                intent.putE
 //                mContext.startActivity(intent);
-                ImageView imageView = vh.itemView.findViewById(R.id.goods_image);
-                ActivityTransitionLauncher.with(HomeFragment.this.getActivity()).from(imageView).launch(intent);
+                View view = vh.itemView;
+                ActivityOptions options =
+                        ActivityOptions.makeSceneTransitionAnimation(host,
+                                Pair.create(view, host.getString(R.string.transition_shot)),
+                                Pair.create(view, host.getString(R.string
+                                        .transition_shot_background)));
+//                ImageView imageView = vh.itemView.findViewById(R.id.goods_image);
+//                ActivityTransitionLauncher.with(HomeFragment.this.getActivity()).from(imageView).launch(intent);
+                host.startActivityForResult(intent, REQUEST_CODE_VIEW_SHOT, options.toBundle());
             }
 
             @Override
