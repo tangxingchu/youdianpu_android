@@ -117,4 +117,16 @@ public class QrCodeScannerActivity extends AppCompatActivity implements QRCodeVi
         mQRCodeView.onDestroy();
         super.onDestroy();
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+//        finishAfterTransition();
+        overridePendingTransition(R.anim.activity_top_out, R.anim.activity_top_out);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+    }
 }

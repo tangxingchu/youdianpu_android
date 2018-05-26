@@ -1,11 +1,11 @@
 package com.weichu.youdianpu.ui.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -15,7 +15,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
@@ -24,8 +23,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
@@ -35,17 +32,12 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.mikepenz.iconics.IconicsDrawable;
-import com.mikepenz.iconics.typeface.ITypeface;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.mikepenz.materialdrawer.AccountHeader;
-import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.weichu.youdianpu.R;
-import com.weichu.youdianpu.ui.fragment.HomeFragment;
 import com.weichu.youdianpu.ui.fragment.HomeTabFragment;
 import com.weichu.youdianpu.ui.fragment.MineFragment;
 import com.weichu.youdianpu.ui.fragment.NearbyFragment;
@@ -157,8 +149,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mFaButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, QrCodeScannerActivity.class);
+                Activity host = MainActivity.this;
+                Intent intent = new Intent(host, QrCodeScannerActivity.class);
+//                ActivityOptions options =
+//                        ActivityOptions.makeSceneTransitionAnimation(host,
+//                                Pair.<View, String>create(mFaButton, host.getString(R.string.transition_qrcode_activity)));
                 startActivityForResult(intent, 2);
+                overridePendingTransition(R.anim.activity_top_out, R.anim.activity_bottom_in);
             }
         });
         //百度定位
