@@ -122,7 +122,9 @@ public class QrCodeScannerActivity extends AppCompatActivity implements QRCodeVi
     public void onBackPressed() {
         super.onBackPressed();
 //        finishAfterTransition();
-        overridePendingTransition(R.anim.activity_top_out, R.anim.activity_top_out);
+        //参数1， 下一个onResume的activity的进入动画
+        //参数2, onStop的activity的退出动画
+        overridePendingTransition(0, R.anim.activity_top_out);
     }
 
     @Override

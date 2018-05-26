@@ -155,7 +155,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                        ActivityOptions.makeSceneTransitionAnimation(host,
 //                                Pair.<View, String>create(mFaButton, host.getString(R.string.transition_qrcode_activity)));
                 startActivityForResult(intent, 2);
-                overridePendingTransition(R.anim.activity_top_out, R.anim.activity_bottom_in);
+                //参数1， 下一个onResume的activity的进入动画
+                //参数2, onStop的activity的退出动画
+                overridePendingTransition(R.anim.activity_bottom_in, 0);
             }
         });
         //百度定位
