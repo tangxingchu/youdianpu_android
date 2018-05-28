@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         if (mHomeTabFragment == null) {
             mHomeTabFragment = new HomeTabFragment();
-            fragmentTransaction.add(R.id.fragmentContainer, mHomeTabFragment, HOME_FRAGMENT);
+            fragmentTransaction.add(R.id.fragmentContainer, mHomeTabFragment, HOME_TAB_FRAGMENT);
             mStack.push(mHomeTabFragment);
         }
         fragmentTransaction.commit();
@@ -273,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (mHomeTabFragment == null) {
                             mHomeTabFragment = new HomeTabFragment();
                         }
-                        addFragment(mHomeTabFragment, HOME_FRAGMENT);
+                        addFragment(mHomeTabFragment, HOME_TAB_FRAGMENT);
                         break;
                     case 1:
                         if (mNearbyFragment == null) {
